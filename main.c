@@ -6,13 +6,13 @@
 #define PORTD_CONFIG 0b11100000
 
 
-static inline void uart_init(uint16_t ubrr);
-static inline uint8_t getc();
-static inline void shit_raw(uint8_t c);
-static inline void shit_encoded(uint8_t n);
+void uart_init(uint16_t ubrr);
+uint8_t getc();
+void shit_raw(uint8_t c);
+void shit_encoded(uint8_t n);
 
 
-static inline void uart_init(uint16_t ubrr) {
+void uart_init(uint16_t ubrr) {
   UBRR0H = (unsigned char)(ubrr>>8);
   UBRR0L = (unsigned char)(ubrr);
 
@@ -20,18 +20,18 @@ static inline void uart_init(uint16_t ubrr) {
   UCSR0C = (1<<USBS0)|(3<<UCSZ00);
 }
 
-static inline uint8_t getc() {
+uint8_t getc() {
   while(!(UCSR0A & (1<<RXC0)));
   return UDR0;
 }
 
-static inline void shit_raw(uint8_t c) {
+void shit_raw(uint8_t c) {
   // (c & 0b00000001) is always 0
   PORTD = c & 0b11100000;
   PORTB = ((c & 0b00011100) << 3)|((c & 0b00000010)>>1);
 }
 
-static inline void shit_encoded(uint8_t n) {
+void shit_encoded(uint8_t n) {
   if( n > 15 ) n = 14;
   switch(n) {
     case 0:  shit_raw(0b11101110); break;
